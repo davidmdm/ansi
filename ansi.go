@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -54,6 +55,10 @@ func (term Terminal) ClearLineBeforeCursor() {
 
 func (term Terminal) ClearLine() {
 	_, _ = fmt.Fprint(term.Writer, "\u001B[2K")
+}
+
+func (term Terminal) Set(modes ...int) {
+	fmt.Fprint(term.Writer, Esc(modes...))
 }
 
 type SpinnerOptions struct {
@@ -126,4 +131,52 @@ func (term Terminal) Spinner(opts SpinnerOptions) (chan<- string, func()) {
 var (
 	Stdout = Terminal{os.Stdout}
 	Stderr = Terminal{os.Stderr}
+)
+
+func Esc(modes ...int) string {
+	modeTxt := ""
+	for i, mode := range modes {
+		if i != 0 {
+			modeTxt += ";"
+		}
+		modeTxt += strconv.Itoa(mode)
+	}
+	return "\u001B[" + modeTxt + "m"
+}
+
+const (
+	ResetModes         = 0
+	Bold               = 1
+	Dim                = 2
+	Italic             = 3
+	Underline          = 4
+	Blink              = 5
+	Inverse            = 7
+	Hidden             = 8
+	StrikeThrough      = 9
+	ResetBoldDim       = 22
+	ResetItalic        = 23
+	ResetUnderline     = 24
+	ResetBlink         = 25
+	ResetInverse       = 27
+	ResetHidden        = 28
+	ResetStrikethrough = 29
+	FgBlack            = 30
+	BgBlack            = 40
+	FgRed              = 31
+	BgRed              = 41
+	FgGreen            = 32
+	BgGreen            = 42
+	FgYellow           = 33
+	BgYellow           = 43
+	FgBlue             = 34
+	BgBlue             = 44
+	FgMagenta          = 35
+	BgMagenta          = 45
+	FgCyan             = 36
+	BgCyan             = 46
+	FgWhite            = 37
+	BgWhite            = 47
+	FgDefault          = 39
+	BgDefault          = 49
 )
