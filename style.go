@@ -3,7 +3,6 @@ package ansi
 import (
 	"fmt"
 	"io"
-	"os"
 	"strconv"
 )
 
@@ -35,7 +34,7 @@ func (style Style) sprint(value string) string {
 }
 
 func (style Style) Sprint(args ...any) string {
-	return fmt.Sprint(fmt.Sprint(args...))
+	return style.sprint(fmt.Sprint(args...))
 }
 
 func (style Style) Sprintln(args ...any) string {
@@ -59,15 +58,15 @@ func (style Style) Fprintln(w io.Writer, args ...any) {
 }
 
 func (style Style) Printf(format string, args ...any) {
-	_, _ = fmt.Fprint(os.Stdout, style.Sprintf(format, args...))
+	_, _ = fmt.Print(style.Sprintf(format, args...))
 }
 
 func (style Style) Print(args ...any) {
-	_, _ = fmt.Fprint(os.Stdout, style.Sprint(args...))
+	_, _ = fmt.Print(style.Sprint(args...))
 }
 
 func (style Style) Println(args ...any) {
-	_, _ = fmt.Fprint(os.Stdout, style.Sprintln(args...))
+	_, _ = fmt.Print(style.Sprintln(args...))
 }
 
 const (
