@@ -65,6 +65,7 @@ type SpinnerOptions struct {
 	InitialText     string
 	SpinnerInterval time.Duration
 	ClearAfterStop  bool
+	Buffered        bool
 }
 
 func (term Terminal) Spinner(opts SpinnerOptions) (chan<- string, func()) {
@@ -97,19 +98,24 @@ func (term Terminal) Spinner(opts SpinnerOptions) (chan<- string, func()) {
 
 	wg.Add(1)
 	go func() {
+		defer wg.Done()
+
 		ticker := time.NewTicker(opts.SpinnerInterval)
 		defer ticker.Stop()
 
 		for {
 			select {
 			case text = <-messages:
+				if opts.Buffered {
+					continue
+				}
 				print()
 			case <-ticker.C:
 				i++
 				ticker.Reset(opts.SpinnerInterval)
 				print()
 			case <-done:
-				wg.Done()
+				print()
 				return
 			}
 		}
